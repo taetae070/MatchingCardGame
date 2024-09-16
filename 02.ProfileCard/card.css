@@ -1,1 +1,110 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
+#profileSection {
+    display: flex;
+    justify-content: center; /* 수평 중앙 정렬 */
+    align-items: center; /* 수직 중앙 정렬 */
+    height: 100vh; 
+    margin: 0 auto;
+}
+#profileUl{
+    display: flex;
+    justify-content: space-between; 
+    flex-wrap: wrap;
+    gap: 24px;
+    width: 61.25rem; 
+    margin: 0 50px;
+}
+#profileUl li{
+  list-style-type: none;
+  border: 1px solid #000;
+  border-radius: 12px;
+  width: calc(33.333% - 16px);
+  /* min-height: 15.625rem;  */
+  /* min-width: 250px; */
+  position: relative;
+  overflow: hidden;
+}
+
+#profileUl li img{
+    border-top-left-radius: 12px; 
+    border-top-right-radius: 12px; 
+}
+
+#profileUl figure{
+    padding: 0;
+    margin: 0;
+}
+#profileUl figure figcaption{
+    padding: 0 16px 16px;
+}
+#profileUl figure figcaption p{
+   font-size: 1rem;
+   overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; 
+  -webkit-box-orient: vertical;
+  display: -webkit-box;     
+}
+#profileUl h2{
+font-size: 1.625rem;
+  margin: 10px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2; 
+}
+#profileUl .imgWrapper{
+    position: relative;
+}
+
+#profileUl .profileCheckbox{
+    position: absolute;
+    bottom: calc(5% + 5px);
+    right: calc(2% + 5px); 
+}
+
+/* profileImg click event */
+.profileImg{
+    width: 100%; 
+    height: auto;
+    aspect-ratio: 16 / 9;
+    cursor: pointer;
+    filter: blur(5px);
+    transition: transform 0.4s ease-in-out; 
+}
+.profileImg.show{
+    filter: none;
+}
+.profileImg.enlarged{
+    position: absolute;
+    top: 80%; 
+    transform:  translate(0%, 25%) scale(1.8);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+@media (max-width: 768px){
+    #profileUl li{
+        width: calc(50% - 16px);
+    }
+}
+@media (max-width: 570px){
+    #profileUl li {
+        height: auto;
+    }
+}
+@media (max-width: 570px){
+    #profileUl h2 {
+        font-size: 1rem;
+    }
+    #profileUl p {
+        font-size: 12px;
+    }
+    
+
+}
