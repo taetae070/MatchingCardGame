@@ -1,11 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
+  //menuListData: 추후 백엔드 API 연동을 통해 교체
   const menuListData = {
     dropDown1: ['item A', 'item B', 'item C', 'item D'],
     dropDown2: ['item 1', 'item 2', 'item 3', 'item 4']  
   }
   const dropDowns = document.querySelectorAll('.dropDownWrapper');
    
-  // li 만들기
+  // li 만들기: 메뉴 항목 변경 시, 쉽게 적용할 수 있게 html 직접작성대신 스크립트로 작성
     dropDowns.forEach((dropDown, index) => {
       const menuUl = dropDown.querySelector('ul')
       const menuItems = index === 0 ? menuListData.dropDown1 : menuListData.dropDown2; //두 ul중 선택
@@ -14,8 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const li = document.createElement('li');
         li.textContent = item; 
         menuUl.appendChild(li);
-      });
-      
+      });  
     });
 
 
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
   menuNav.addEventListener('click', (e) => {
     if (e.target.matches('.menuBtn')) { // 버튼 클릭 시만 동작
       const menuUL = e.target.closest('.dropDownWrapper').querySelector('ul');
-      menuUL.classList.toggle('show'); // ul에 show 클래스를 토글하여 열고 닫기
+      menuUL.classList.toggle('show'); 
       e.stopPropagation();
     }
   });
@@ -55,8 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   });
-
-
 
 
   //키킼키키키보드
