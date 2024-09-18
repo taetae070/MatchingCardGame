@@ -52,12 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
             h2.textContent = person.name;
             p.textContent = person.description;
 
-            //대체 이미지
-            img.onerror = function () {
-                this.src = './profileImgs/alt.png'; 
-              };
-
-            // 전체 구성하기
+            // 전체 구성
             figcaption.appendChild(h2);
             figcaption.appendChild(p);
             imgWrapper.appendChild(img);
@@ -66,45 +61,56 @@ document.addEventListener('DOMContentLoaded', () => {
             figure.appendChild(figcaption);
             article.appendChild(figure);
             li.appendChild(article);
-            profileUl.appendChild(li);
-            // checkBox.appendChild(img);
+            profileUl.appendChild(li);    
+            
+            //대체 이미지
+            img.onerror = function () {
+            this.onerror = null;
+            this.src = './profileImgs/base.png';
+            };
+        }      
+    }   
+     createProfileLi();
+
+
+    //checkBox click event
+    const checkBoxs = document.querySelectorAll('.profileCheckbox');
+    checkBoxs.forEach((box) =>{
+        box.addEventListener('click', (e) => {
+            const theProfile = box.closest('li');
+            const theImg = theProfile.querySelector('.profileImg');
+            theImg.classList.toggle('show');
+        })
+    });
+
+    //프로필 이미지 확대 이벤트
+    const profileUl = document.getElementById('profileUl');
+
+    profileUl.addEventListener('click', (e) => {
+        const profileLi = e.target.closest('li');
+        const theCheckBox = profileLi.querySelector('.profileCheckbox');
+        const theImg = profileLi.querySelector('img');
+
+        //이미지 확대조건: 체크박스 체크
+        if(theCheckBox.checked){
+            e.target.classList.toggle('enlarged');
+        }else if(!e.target.classList.contains('enlarged')){
+            alert('프로필 사진을 확대하려면 먼저 체크를 해주세요')
         }
-  }   
-  createProfileLi();
 
-  //checkBox click event
-  const checkBoxs = document.querySelectorAll('.profileCheckbox');
-  checkBoxs.forEach((box) =>{
-    box.addEventListener('click', (e) => {
-        const theProfile = box.closest('li');
-        const theImg = theProfile.querySelector('.profileImg');
-        theImg.classList.toggle('show');
+        //기본 프로필: 확대이벤트 비활성화
+        // theImg와 src가 모두 정의된 경우에만 처리
+        if (theImg && theImg.src) {  
+            const baseImg = theImg.src.includes('base.png'); 
+            if (baseImg) {
+                theImg.classList.add('baseImg'); 
+            }
+        } else {
+            console.log('이미지 요소 또는 src를 찾을 수 없습니다.');
+        }
+    
+        if(e.target.classList.contains('baseImg') ){
+            e.target.classList.remove('enlarged');
+        }
     })
-  });
-
-  //프로필 이미지 확대 이벤트
-  const profileUl = document.getElementById('profileUl');
-
-  profileUl.addEventListener('click', (e) => {
-    const profileLi = e.target.closest('li');
-    const theCheckBox = profileLi.querySelector('.profileCheckbox');
-
-    //체크박스를 체크해야 이미지 확대
-    if(theCheckBox.checked){
-        e.target.classList.toggle('enlarged');
-        //이미지 확대한 상태에서 체크해제하면 alert은 뜨지 않음
-    }else if(!e.target.classList.contains('enlarged')){
-        alert('프로필 사진을 확대하려면 먼저 체크를 해주세요')
-    }
-  })
-
-    
-   
-    
-
-
-
-
-
-
 });
