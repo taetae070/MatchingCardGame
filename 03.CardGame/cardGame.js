@@ -16,16 +16,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     shuffle(cards);
 
-    // 게임보드에 카드 생성
+    // 카드 생성
     const gameBoard = document.querySelector('.gameBoard');
+    const allCardWrapper = document.querySelector('.allCardWrapper');
     let flippedCards = [];
 
     //flipped 클래스: 화면 로딩하자마자 디폴트 값 (카드 과일이미지는 안보이고 파란배경만 보이는 상태) 
     function createBoard() {
+        allCardWrapper.innerHTML = '';
+
         //card: cards배열의 요소
         cards.forEach((cardImg) => {
-            const cardContainer = document.createElement('div');
-            cardContainer.classList.add('card');            
+            const card = document.createElement('div');
+            card.classList.add('card');            
 
             const cardInner = document.createElement('div');
             cardInner.classList.add('cardInner');
@@ -41,11 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
             imgElement.alt = 'Card Image';
             imgElement.classList.add('CardPngs');
            
-            cardBack.appendChild(imgElement); 
             cardInner.appendChild(cardFront);
             cardInner.appendChild(cardBack);
-            cardContainer.appendChild(cardInner);
-            gameBoard.appendChild(cardContainer);          
+            cardBack.appendChild(imgElement); 
+            card.appendChild(cardInner);
+            allCardWrapper.appendChild(card);
+            if (!gameBoard.contains(allCardWrapper)) {
+                gameBoard.appendChild(allCardWrapper);
+            }        
         });
         //카드 뒷면 3초 보이기
         const allBackImg = document.querySelectorAll('.cardBack'); 
@@ -61,41 +67,72 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     createBoard();
 
-    
-
+    //게임 동작방법 설정
     const Fronts = document.querySelectorAll('.cardFront');
     const Backs = document.querySelectorAll('.cardBack');
     let filppedCards = [];  //클릭한 카드들의 이미지 경로 저장
     let flippedCardElements = []; // 클릭한 카드의 DOM 요소 저장
 
+    //시간, 시도 횟수
+    let matchedCards = 0; 
+    let rounds = 0;
+    let startTime; 
+    let elapsedTime = 0;
+    let timerInterval; 
+
+    function startGameTimer() {
+        startTime = Date.now(); 
+
+        timerInterval = setInterval(() => {
+            const currentTime = Date.now();
+            const elapsedTIme = ((currentTime - startTime)/1000).toFixed(0);
+            document.getElementById('time').textContent = `걸린 시간: ${elapsedTIme}초`;
+            rounds++;
+        }, 1000);
+    }
+    
+    //버튼클릭하면 타이머시작
+    const startBtn = document.getElementById('startBtn');
+    startBtn.addEventListener('click', () => {
+        startGameTimer();
+        clearInterval(timerInterval);
+    });
+   
+    //16개 카드 다 맞췄을 때
+    function handleCardMatch() {
+        matchedCards += 2; 
+        if (matchedCards === 16) {
+            const finishedTime = Date.now();
+            // const tookTime = Math.round ((finishedTime - startTime)*1000) /1000
+            alert('게임 종료! 모두 맞췄습니다.');
+   
+            clearInterval(timerInterval);
+            const timeDOM = document.getElementById('time');
+            const tryDOM = document.getElementById('try');
+            timeDOM.textContent = `걸린 시간: ${elapsedTime}초`;
+            tryDOM.textContent = `회차: ${rounds}`;
+
+        }
+    }
+    
     /* handleCardClick 함수만들면서 소감
-    겪었던 문제점 :카드 2개가 안 맞았을 때 초기화가 안되서 카드가 안뒤집어짐.
-    원인: 카드를 뒤집어야하는데 나는 이미지 경로를 저장한 filppedCards배열만 사용했다. 카드 요소, 즉 DOM요소를 서로 비교할 수 있는 비교군 자체가 없어서 초기화가 안됐던 것이었다.
+    겪었던 문제점: 카드 2개가 안 맞았을 때 초기화가 안되서 카드가 원래대로 안뒤집어짐.
+    원인: 카드를 뒤집어야하는데 이미지 경로를 저장한 filppedCards배열만 사용했다. 카드 요소, 즉 DOM요소를 서로 비교할 수 있는 비교군 자체가 없어서 초기화가 안됐던 것이었다.
     해결방법: 클릭한 카드의 DOM 요소 저장해주는 flippedCardElements배열 추가함.
 
     새로 생긴 궁금증: 클릭한 요소를 넣은 배열이 flippedCardElements니까 이 배열을 굳이 안쓰고 handleCardClick함수에 전달해준 매개변수 Front, Back에 e.target을 사용해서 좀 더 간단하게 코드를 짤수 없을까?
 
     결론: 안된다.
-    이유: e.target은 이벤트가 발생한 순간에만 사용할 수 있다. 클릭한 시점에는 e.target으로 클릭된 요소에 접근할 수 있지만, 그 이벤트가 끝나고 나면 e.target은 더 이상 유지되지 않는다. 따라서 setTimeout기능이 필요한 이 함수에는 적절하지 않다.
+    이유: e.target은 이벤트가 발생한 순간에만 사용할 수 있다. 클릭한 시점에는 e.target으로 클릭된 요소에 접근할 수 있지만, 그 이벤트가 끝나고 나면 e.target은 더 이상 유지되지 않는다. 따라서 setTimeout기능을 사용하는 이 함수에는 적절하지 않다.
     */
-   
     function handleCardClick(Front, Back){
+        // rounds++;
+        console.log('몇판',rounds);
         //과일이미지 보이게, 컬러배경 안보이게
         Front.classList.remove('flipped');
         Back.classList.remove('flipped');
         flippedCards.push(Back.querySelector('img').src); 
         flippedCardElements.push({ Front, Back });
-
-        // console.log('flippedCardElements:',flippedCardElements);
-        // console.log('flippedCards:',flippedCards);
-
-        let matchedCards = 0;
-        function handleCardMatch() {
-            matchedCards += 2; 
-            if (matchedCards === 16) {
-                alert('게임 종료! 모두 맞췄습니다.');
-            }
-        }
 
         //1개만 선택했을 때
         if(flippedCardElements.length === 1){
@@ -106,10 +143,9 @@ document.addEventListener('DOMContentLoaded', () => {
             handleCardMatch();
             flippedCards = [];
             flippedCardElements = [];
-            
-            console.log(matchedCards);
-        }
-            
+
+            // console.log(matchedCards);
+        }       
         //2개가 일치하지 않았을 때
         else if(flippedCards[0] !== flippedCards[1]){
             setTimeout(() => {
@@ -120,26 +156,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 flippedCards = [];
                 flippedCardElements = [];
             }, 1000);
-        }       
-        
+        }          
     }  
 
     Fronts.forEach((Front, index) => {
         const Back = Backs[index]; //클릭한 front카드의 인덱스와 동일한 인덱스를 가진 뒷면카드
         Front.addEventListener('click', () => {
+            // if(!startTime){
+            //     startGameTimer();
+            // }
             handleCardClick(Front, Back);
-            const startTime = Date.now();
+            // console.log('시작',startTime); startTime에 기록된 긴 숫자는 1970년 1월 1일부터 현재까지의 밀리초를 나타낸다.
         });
     });
 
+
+    // console.log('맞춤',matchedCards);
     
     
+   
 
-    // 게임 종료
-    function endGame() {
-    alert('게임 종료! 모두 맞췄습니다.');
-    }
-
+    
 
 
 

@@ -13,10 +13,22 @@
   }
   
   .gameBoard {
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+    align-items: center;
+   gap: 6.25rem;
+  }
+  .record{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .allCardWrapper{
     display: grid;
     grid-template-columns: repeat(8, 6.25rem);
     grid-template-rows: repeat(1, 6.25rem);
-    gap: 10px;
+    gap: 16px 10px;
   }
   
   .card {
@@ -65,6 +77,10 @@
     
     .cardFront.flipped{
         backface-visibility: visible;
+    }
+
+    #startBtn {
+        padding: 20px 12px;
     }
   
 
