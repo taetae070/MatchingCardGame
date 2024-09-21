@@ -1,0 +1,27 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .timerSection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction:column ;
+    gap: 1.875rem;
+    background-color: #fff;
+    margin: 6.25rem;
+  }
+  #timer{
+    margin-bottom: 10px;
+  }
+  .yesBtn, .noBtn, .startBtn{
+    padding: 1rem 4rem;
+    background-color: #549dd4;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+ .yesBtn{
+    margin-right: 10px;
+ }

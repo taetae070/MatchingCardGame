@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function createBoard() {
         allCardWrapper.innerHTML = '';
 
-        //card: cards배열의 요소
         cards.forEach((cardImg) => {
             const card = document.createElement('div');
             card.classList.add('card');            
@@ -49,23 +48,30 @@ document.addEventListener('DOMContentLoaded', () => {
             cardBack.appendChild(imgElement); 
             card.appendChild(cardInner);
             allCardWrapper.appendChild(card);
+            
+            //allCardWrapper는 한번만 생성
             if (!gameBoard.contains(allCardWrapper)) {
                 gameBoard.appendChild(allCardWrapper);
             }        
         });
         //카드 뒷면 3초 보이기
-        const allBackImg = document.querySelectorAll('.cardBack'); 
-        const allFrontImg = document.querySelectorAll('.cardFront'); 
+        const allCardInner = document.querySelectorAll('.cardInner'); 
+        const allBack = document.querySelectorAll('.cardBack'); 
         setTimeout(()=>{
-            allBackImg.forEach((Back) => {
-                Back.classList.add('flipped');
+            allCardInner.forEach((inner) => {
+                inner.classList.add('flipped');
             })
-            allFrontImg.forEach((Front) => {
-                Front.classList.add('flipped');
+            allBack.forEach((Back) => {
+                Back.classList.add('flipped');
+                const backImg = Back.querySelector('img');
+                if (backImg) {
+                    backImg.classList.add('flipped');
+                }
             })
         },3000)
     }
     createBoard();
+    
 
     //게임 동작방법 설정
     const Fronts = document.querySelectorAll('.cardFront');
@@ -80,38 +86,54 @@ document.addEventListener('DOMContentLoaded', () => {
     let elapsedTime = 0;
     let timerInterval; 
 
+    //걸린시간 화면에 1초마다 업데이트
+    /*
+    elapsedTime이 자꾸 0으로 기록됨
+    원인: elapsedTime가 startGameTimer안에서만 업데이트되고 있기때문
+    해결방법: const elapsedTime 로 즤
+    */
     function startGameTimer() {
         startTime = Date.now(); 
-
         timerInterval = setInterval(() => {
             const currentTime = Date.now();
-            const elapsedTIme = ((currentTime - startTime)/1000).toFixed(0);
-            document.getElementById('time').textContent = `걸린 시간: ${elapsedTIme}초`;
-            rounds++;
+            elapsedTime = ((currentTime - startTime)/1000).toFixed(0);
+            document.getElementById('time').textContent = `걸린 시간: ${elapsedTime}초`;
         }, 1000);
     }
     
     //버튼클릭하면 타이머시작
     const startBtn = document.getElementById('startBtn');
-    startBtn.addEventListener('click', () => {
-        startGameTimer();
-        clearInterval(timerInterval);
+    startBtn.addEventListener('click', (e) => {
+        const backCards = e.target.querySelectorAll('.flipped');
+        const frontCards = e.target.querySelectorAll('.flipped');
+        let allFlipped = true;
+
+        //화면 로딩 3초후 카드가 다 뒤집어져야 타이머시작
+        backCards.forEach((backCard, index) => {
+            if (!backCard.classList.contains('flipped') || !frontCards[index].classList.contains('flipped')) {
+                allFlipped = false; 
+            }
+        });
+        if(allFlipped){
+            startGameTimer();
+        }
     });
-   
-    //16개 카드 다 맞췄을 때
+
+    //카드 다 맞췄을 때
+    const Allcard = document.querySelectorAll('.card');
     function handleCardMatch() {
         matchedCards += 2; 
-        if (matchedCards === 16) {
-            const finishedTime = Date.now();
-            // const tookTime = Math.round ((finishedTime - startTime)*1000) /1000
-            alert('게임 종료! 모두 맞췄습니다.');
-   
-            clearInterval(timerInterval);
-            const timeDOM = document.getElementById('time');
-            const tryDOM = document.getElementById('try');
-            timeDOM.textContent = `걸린 시간: ${elapsedTime}초`;
-            tryDOM.textContent = `회차: ${rounds}`;
+        if (matchedCards === Allcard.length) {
+            const finalTime = elapsedTime;
+            console.log(finalTime);
 
+            const timeDOM = document.getElementById('time');
+            timeDOM.textContent = `걸린 시간: ${finalTime}초`;
+            alert('게임 종료! 모두 맞췄습니다.');
+
+            if(timerInterval){
+                clearInterval(timerInterval);
+            }    
         }
     }
     
@@ -123,16 +145,19 @@ document.addEventListener('DOMContentLoaded', () => {
     새로 생긴 궁금증: 클릭한 요소를 넣은 배열이 flippedCardElements니까 이 배열을 굳이 안쓰고 handleCardClick함수에 전달해준 매개변수 Front, Back에 e.target을 사용해서 좀 더 간단하게 코드를 짤수 없을까?
 
     결론: 안된다.
-    이유: e.target은 이벤트가 발생한 순간에만 사용할 수 있다. 클릭한 시점에는 e.target으로 클릭된 요소에 접근할 수 있지만, 그 이벤트가 끝나고 나면 e.target은 더 이상 유지되지 않는다. 따라서 setTimeout기능을 사용하는 이 함수에는 적절하지 않다.
+    이유: e.target은 이벤트가 발생한 순간에만 사용할 수 있다. 클릭한 시점에는 e.target으로 클릭된 요소에 접근할 수 있지만, 그 이벤트가 끝나고 나면 e.target은 더 이상 유지되지 않는다. 따라서 클릭한 요소를 저장해두고 이를 처리해야하는 이 함수에는 적절하지 않다.
     */
-    function handleCardClick(Front, Back){
-        // rounds++;
-        console.log('몇판',rounds);
-        //과일이미지 보이게, 컬러배경 안보이게
-        Front.classList.remove('flipped');
-        Back.classList.remove('flipped');
+    function handleCardClick(Front, Back, cardInner, cardImg){
+        rounds++;
+        const tryDOM = document.getElementById('try');
+        tryDOM.textContent = `회차: ${rounds}`;
+        
         flippedCards.push(Back.querySelector('img').src); 
-        flippedCardElements.push({ Front, Back });
+        flippedCardElements.push({ Front, Back, cardInner });
+        //과일이미지 보이게, 컬러배경 안보이게
+        cardInner.classList.remove('flipped');
+        Front.classList.add('flipped');
+        Back.classList.remove('flipped');
 
         //1개만 선택했을 때
         if(flippedCardElements.length === 1){
@@ -143,15 +168,14 @@ document.addEventListener('DOMContentLoaded', () => {
             handleCardMatch();
             flippedCards = [];
             flippedCardElements = [];
-
-            // console.log(matchedCards);
         }       
         //2개가 일치하지 않았을 때
         else if(flippedCards[0] !== flippedCards[1]){
             setTimeout(() => {
-                flippedCardElements.forEach(card => {
-                    card.Front.classList.add('flipped');  
-                    card.Back.classList.add('flipped');   
+                flippedCardElements.forEach((card) => {
+                    card.cardInner.classList.add('flipped');
+                    card.Front.classList.remove('flipped');
+                    card.Back.classList.add('flipped'); 
                 });
                 flippedCards = [];
                 flippedCardElements = [];
@@ -161,17 +185,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     Fronts.forEach((Front, index) => {
         const Back = Backs[index]; //클릭한 front카드의 인덱스와 동일한 인덱스를 가진 뒷면카드
+        const cardInner = Front.parentElement; 
+        const cardImg = cardInner.querySelector('img');
         Front.addEventListener('click', () => {
-            // if(!startTime){
-            //     startGameTimer();
-            // }
-            handleCardClick(Front, Back);
-            // console.log('시작',startTime); startTime에 기록된 긴 숫자는 1970년 1월 1일부터 현재까지의 밀리초를 나타낸다.
+            handleCardClick(Front, Back, cardInner, cardImg);
         });
     });
 
 
-    // console.log('맞춤',matchedCards);
+
     
     
    
