@@ -25,8 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //profile list 만들기
     function createProfileLi() {
         const profileUl = document.getElementById('profileUl');
-
-        //for...in: 객체의 열거 가능한 모든 속성을 반복하는 루프
+        
         for( const key in profileData){
             const person = profileData[key];
 
