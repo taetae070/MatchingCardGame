@@ -43,7 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     menuBtn.addEventListener('keydown', (e) => {
       e.stopPropagation(); 
-      // console.log('Key pressed:', e.key); 
   
       if (e.key === 'Enter' || e.key === ' ') {
         menuUl.classList.toggle('show');
